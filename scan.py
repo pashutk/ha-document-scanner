@@ -23,11 +23,12 @@ from pathlib import Path
 PRINTER_IP = os.environ.get("SCANNER_PRINTER_IP")
 SCAN_DIR_STR = os.environ.get("SCANNER_OUTPUT_DIR")
 RESOLUTION = int(os.environ.get("SCANNER_RESOLUTION", "300"))
+COLOR_MODE_MAP = {"color": "RGB24", "grayscale": "Grayscale8", "bw": "BlackAndWhite1"}
+COLOR_MODE = COLOR_MODE_MAP.get(os.environ.get("SCANNER_COLOR_MODE", "color"), "RGB24")
+PAPER_SIZES = {"a4": (2550, 3508), "letter": (2550, 3300)}
+WIDTH, HEIGHT = PAPER_SIZES.get(os.environ.get("SCANNER_PAPER_SIZE", "a4"), (2550, 3508))
 SUPERVISOR_TOKEN = os.environ.get("SUPERVISOR_TOKEN")
 HA_API = "http://supervisor/core/api"
-
-WIDTH = 2550
-HEIGHT = 3508
 
 SCAN_SETTINGS = """\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -45,7 +46,7 @@ SCAN_SETTINGS = """\
     </pwg:ScanRegions>
     <pwg:InputSource>Platen</pwg:InputSource>
     <pwg:DocumentFormat>application/pdf</pwg:DocumentFormat>
-    <scan:ColorMode>RGB24</scan:ColorMode>
+    <scan:ColorMode>{color_mode}</scan:ColorMode>
     <scan:XResolution>{resolution}</scan:XResolution>
     <scan:YResolution>{resolution}</scan:YResolution>
     <scan:Intent>Document</scan:Intent>
@@ -110,7 +111,7 @@ def scan_page():
     if "Idle" not in status_xml:
         raise RuntimeError("Scanner is not idle")
 
-    xml = SCAN_SETTINGS.format(width=WIDTH, height=HEIGHT, resolution=RESOLUTION)
+    xml = SCAN_SETTINGS.format(width=WIDTH, height=HEIGHT, resolution=RESOLUTION, color_mode=COLOR_MODE)
     req = urllib.request.Request(
         f"{base_url}/eSCL/ScanJobs",
         data=xml.encode(),

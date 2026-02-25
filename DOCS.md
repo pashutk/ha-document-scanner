@@ -102,3 +102,6 @@ Files are named by date: `2026-02-25.pdf`, `2026-02-25_2.pdf`, etc.
 |--------|---------|-------------|
 | `printer_ip` | — | Your printer's IP address |
 | `resolution` | 300 | Scan resolution in DPI |
+| `color_mode` | color | Color mode: `color`, `grayscale`, or `bw` |
+| `paper_size` | a4 | Paper size: `a4` or `letter` |
+| `scan_folder` | scans | Folder name inside `/media/` |

@@ -1,6 +1,6 @@
 name: "Document Scanner"
 description: "Scan documents from HP printer via eSCL"
-version: "1.2.0"
+version: "1.3.0"
 slug: "scanner"
 init: false
 arch:
@@ -13,6 +13,12 @@ map:
 options:
   printer_ip: "192.168.1.15"
   resolution: 300
+  color_mode: color
+  paper_size: a4
+  scan_folder: scans
 schema:
   printer_ip: str
   resolution: int
+  color_mode: list(color|grayscale|bw)
+  paper_size: list(a4|letter)
+  scan_folder: str
