@@ -22,6 +22,8 @@ from pathlib import Path
 PRINTER_IP = os.environ.get("SCANNER_PRINTER_IP")
 SCAN_DIR_STR = os.environ.get("SCANNER_OUTPUT_DIR")
 RESOLUTION = int(os.environ.get("SCANNER_RESOLUTION", "300"))
+SUPERVISOR_TOKEN = os.environ.get("SUPERVISOR_TOKEN")
+HA_URL = "http://supervisor/core/api"
 
 WIDTH = 2550
 HEIGHT = 3508
@@ -47,6 +49,28 @@ SCAN_SETTINGS = """\
     <scan:YResolution>{resolution}</scan:YResolution>
     <scan:Intent>Document</scan:Intent>
 </scan:ScanSettings>"""
+
+
+def set_status(state, filename=""):
+    if not SUPERVISOR_TOKEN:
+        return
+    data = json.dumps({
+        "state": state,
+        "attributes": {"friendly_name": "Scanner", "file": filename},
+    }).encode()
+    req = urllib.request.Request(
+        f"{HA_URL}/states/sensor.scanner_status",
+        data=data,
+        headers={
+            "Authorization": f"Bearer {SUPERVISOR_TOKEN}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
 
 
 def get_latest_file(scan_dir):
@@ -172,11 +196,14 @@ def main():
             continue
 
         print(f"Scanning ({mode})...", flush=True)
+        set_status("scanning")
         try:
             target = do_scan(mode, scan_dir)
             print(f"Saved to {target}", flush=True)
+            set_status("idle", filename=os.path.basename(target))
         except Exception as e:
             print(f"Error: {e}", flush=True)
+            set_status("error")
 
 
 if __name__ == "__main__":
