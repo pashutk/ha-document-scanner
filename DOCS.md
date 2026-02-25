@@ -12,10 +12,10 @@ Go to the addon **Configuration** tab and set your printer's IP address.
 
 Go to **Settings → Scripts → Create**, click the three dots → **Edit as YAML**, and paste:
 
-**Scanner: Append Page** (appends to today's document):
+**Scanner Append** (appends to today's document):
 
 ```yaml
-alias: "Scanner: Append Page"
+alias: Scanner Append
 icon: mdi:scanner
 sequence:
   - condition: not
@@ -29,10 +29,10 @@ sequence:
       input: append
 ```
 
-**Scanner: New Document** (starts a new file):
+**Scanner New** (starts a new file):
 
 ```yaml
-alias: "Scanner: New Document"
+alias: Scanner New
 icon: mdi:scanner
 sequence:
   - condition: not
