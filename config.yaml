@@ -1,0 +1,19 @@
+name: "Document Scanner"
+description: "Scan documents from HP printer via eSCL"
+version: "1.0.0"
+slug: "scanner"
+init: false
+arch:
+  - aarch64
+  - amd64
+ports:
+  8099/tcp: 8099
+host_network: true
+map:
+  - media:rw
+options:
+  printer_ip: "192.168.1.15"
+  resolution: 300
+schema:
+  printer_ip: str
+  resolution: int
