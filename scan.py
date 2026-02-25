@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """Scanner automation script for HP printers via eSCL protocol.
 
-Usage:
-  scan.py append   - Scan and append to today's document
-  scan.py new      - Scan to a new document
-  scan.py serve    - Run HTTP server (for HA addon)
+Reads commands from stdin: "append" or "new" (one per line).
 
 Environment variables:
   SCANNER_PRINTER_IP   - Printer IP address (required)
@@ -13,21 +10,18 @@ Environment variables:
 """
 
 import io
-import json
 import os
 import sys
 import time
 import urllib.error
 import urllib.request
 from datetime import date
-from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
 PRINTER_IP = os.environ.get("SCANNER_PRINTER_IP")
 SCAN_DIR_STR = os.environ.get("SCANNER_OUTPUT_DIR")
 RESOLUTION = int(os.environ.get("SCANNER_RESOLUTION", "300"))
 
-# A4 dimensions in 300ths of inches
 WIDTH = 2550
 HEIGHT = 3508
 
@@ -156,38 +150,7 @@ def do_scan(mode, scan_dir):
     return str(target)
 
 
-class ScanHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        path = self.path.strip("/")
-        if path not in ("scan/append", "scan/new"):
-            self.send_response(404)
-            self.end_headers()
-            return
-
-        mode = path.split("/")[1]
-        scan_dir = Path(SCAN_DIR_STR)
-
-        try:
-            target = do_scan(mode, scan_dir)
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps({"file": target}).encode())
-        except Exception as e:
-            self.send_response(500)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode())
-
-    def log_message(self, format, *args):
-        print(format % args, flush=True)
-
-
 def main():
-    if len(sys.argv) != 2 or sys.argv[1] not in ("append", "new", "serve"):
-        print("Usage: scan.py [append|new|serve]", file=sys.stderr)
-        sys.exit(1)
-
     if not PRINTER_IP:
         print("SCANNER_PRINTER_IP is not set", file=sys.stderr)
         sys.exit(1)
@@ -195,15 +158,21 @@ def main():
         print("SCANNER_OUTPUT_DIR is not set", file=sys.stderr)
         sys.exit(1)
 
-    if sys.argv[1] == "serve":
-        server = HTTPServer(("0.0.0.0", 8099), ScanHandler)
-        print(f"Scanner server listening on port 8099", flush=True)
-        server.serve_forever()
-    else:
-        mode = sys.argv[1]
-        scan_dir = Path(SCAN_DIR_STR)
-        target = do_scan(mode, scan_dir)
-        print(f"Saved to {target}")
+    scan_dir = Path(SCAN_DIR_STR)
+    print("Scanner ready, waiting for commands...", flush=True)
+
+    for line in sys.stdin:
+        mode = line.strip()
+        if mode not in ("append", "new"):
+            print(f"Unknown command: {mode}", flush=True)
+            continue
+
+        print(f"Scanning ({mode})...", flush=True)
+        try:
+            target = do_scan(mode, scan_dir)
+            print(f"Saved to {target}", flush=True)
+        except Exception as e:
+            print(f"Error: {e}", flush=True)
 
 
 if __name__ == "__main__":
