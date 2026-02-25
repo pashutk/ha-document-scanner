@@ -10,6 +10,7 @@ Environment variables:
 """
 
 import io
+import json
 import os
 import sys
 import time
@@ -162,7 +163,10 @@ def main():
     print("Scanner ready, waiting for commands...", flush=True)
 
     for line in sys.stdin:
-        mode = line.strip().strip('"')
+        try:
+            mode = json.loads(line)
+        except json.JSONDecodeError:
+            mode = line.strip()
         if mode not in ("append", "new"):
             print(f"Unknown command: {mode}", flush=True)
             continue
