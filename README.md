@@ -7,6 +7,7 @@ A Home Assistant addon that scans documents from HP printers via the eSCL protoc
 - Scan to PDF from any eSCL-compatible printer (most modern HP, Brother, Canon)
 - Append pages to today's document or start a new one
 - Dashboard status indicator (idle/scanning/error)
+- Dashboard buttons auto-hide while scanning, replaced with status indicator
 - Files accessible via Samba share
 
 ## Installation

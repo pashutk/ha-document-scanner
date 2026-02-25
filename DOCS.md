@@ -46,45 +46,42 @@ sequence:
       input: new
 ```
 
-### 3. Add dashboard cards
+### 3. Add dashboard card
 
-Edit your dashboard and add the following cards manually via YAML.
-
-**Scan buttons** (hidden while scanning):
+Edit your dashboard, add a card, and paste this YAML:
 
 ```yaml
-type: conditional
-conditions:
-  - entity: sensor.scanner_status
-    state_not: scanning
-card:
-  type: horizontal-stack
-  cards:
-    - type: button
-      name: Scan Page
-      icon: mdi:scanner
-      tap_action:
-        action: perform-action
-        perform_action: script.scan_page
-    - type: button
-      name: New Document
-      icon: mdi:file-plus
-      tap_action:
-        action: perform-action
-        perform_action: script.new_document
+type: vertical-stack
+cards:
+  - type: conditional
+    conditions:
+      - entity: sensor.scanner_status
+        state_not: scanning
+    card:
+      type: horizontal-stack
+      cards:
+        - type: button
+          name: Scan Page
+          icon: mdi:scanner
+          tap_action:
+            action: perform-action
+            perform_action: script.scan_page
+        - type: button
+          name: New Document
+          icon: mdi:file-plus
+          tap_action:
+            action: perform-action
+            perform_action: script.new_document
+  - type: conditional
+    conditions:
+      - entity: sensor.scanner_status
+        state: scanning
+    card:
+      type: markdown
+      content: "**Scanning in progress...**"
 ```
 
-**Scanning indicator** (shown while scanning):
-
-```yaml
-type: conditional
-conditions:
-  - entity: sensor.scanner_status
-    state: scanning
-card:
-  type: markdown
-  content: "**Scanning in progress...**"
-```
+The buttons are hidden while a scan is in progress and replaced with a status message.
 
 ## File storage
 
