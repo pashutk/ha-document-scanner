@@ -69,8 +69,9 @@ def set_status(state, filename=""):
     )
     try:
         urllib.request.urlopen(req, timeout=5)
-    except Exception:
-        pass
+        print(f"Status set to: {state}", flush=True)
+    except Exception as e:
+        print(f"Failed to set status: {e}", flush=True)
 
 
 def get_latest_file(scan_dir):
@@ -184,7 +185,7 @@ def main():
         sys.exit(1)
 
     scan_dir = Path(SCAN_DIR_STR)
-    print("Scanner ready, waiting for commands...", flush=True)
+    print(f"Scanner ready (HA API: {'yes' if SUPERVISOR_TOKEN else 'no'}), waiting for commands...", flush=True)
 
     for line in sys.stdin:
         try:
