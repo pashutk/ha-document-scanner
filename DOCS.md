@@ -12,10 +12,10 @@ Go to the addon **Configuration** tab and set your printer's IP address.
 
 Go to **Settings → Scripts → Create**, click the three dots → **Edit as YAML**, and paste:
 
-**Scan Page** (appends to today's document):
+**Scanner: Append Page** (appends to today's document):
 
 ```yaml
-alias: Scan Page
+alias: "Scanner: Append Page"
 icon: mdi:scanner
 sequence:
   - condition: not
@@ -29,11 +29,11 @@ sequence:
       input: append
 ```
 
-**New Document** (starts a new file):
+**Scanner: New Document** (starts a new file):
 
 ```yaml
-alias: New Document
-icon: mdi:file-plus
+alias: "Scanner: New Document"
+icon: mdi:scanner
 sequence:
   - condition: not
     conditions:
@@ -65,13 +65,13 @@ cards:
           icon: mdi:scanner
           tap_action:
             action: perform-action
-            perform_action: script.scan_page
+            perform_action: script.scanner_append
         - type: button
           name: New Document
-          icon: mdi:file-plus
+          icon: mdi:scanner
           tap_action:
             action: perform-action
-            perform_action: script.new_document
+            perform_action: script.scanner_new
   - type: conditional
     conditions:
       - entity: sensor.scanner_status
@@ -79,9 +79,16 @@ cards:
     card:
       type: markdown
       content: "**Scanning in progress...**"
+  - type: conditional
+    conditions:
+      - entity: sensor.scanner_status
+        state: error
+    card:
+      type: markdown
+      content: "**Scan failed.** Check the addon log for details."
 ```
 
-The buttons are hidden while a scan is in progress and replaced with a status message.
+The buttons are hidden while a scan is in progress and replaced with a status message. Errors are shown until the next scan attempt.
 
 ## File storage
 

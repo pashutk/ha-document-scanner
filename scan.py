@@ -173,6 +173,20 @@ def do_scan(mode, scan_dir):
     return str(target)
 
 
+def check_scripts():
+    if not SUPERVISOR_TOKEN:
+        return
+    for script_id in ["scanner_append", "scanner_new"]:
+        try:
+            req = urllib.request.Request(
+                f"{HA_API}/states/script.{script_id}",
+                headers={"Authorization": f"Bearer {SUPERVISOR_TOKEN}"},
+            )
+            urllib.request.urlopen(req, timeout=5)
+        except urllib.error.HTTPError:
+            print(f"WARNING: script.{script_id} not found. See addon documentation for setup.", flush=True)
+
+
 def main():
     if not PRINTER_IP:
         print("SCANNER_PRINTER_IP is not set", file=sys.stderr)
@@ -184,6 +198,7 @@ def main():
     scan_dir = Path(SCAN_DIR_STR)
     print("Scanner ready, waiting for commands...", flush=True)
     set_status("idle")
+    check_scripts()
 
     for line in sys.stdin:
         try:
