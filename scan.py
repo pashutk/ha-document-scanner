@@ -162,7 +162,7 @@ def main():
     print("Scanner ready, waiting for commands...", flush=True)
 
     for line in sys.stdin:
-        mode = line.strip()
+        mode = line.strip().strip('"')
         if mode not in ("append", "new"):
             print(f"Unknown command: {mode}", flush=True)
             continue
