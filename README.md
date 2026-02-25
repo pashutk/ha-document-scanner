@@ -1,6 +1,6 @@
 # Document Scanner for Home Assistant
 
-A Home Assistant addon that scans documents from HP printers via the eSCL protocol. Two dashboard buttons: **Scan Page** appends to today's document, **New Document** starts a fresh file.
+A Home Assistant addon that scans documents from any eSCL/AirScan compatible printer (HP, Brother, Canon, etc.). Two dashboard buttons: **Scan Page** appends to today's document, **New Document** starts a fresh file.
 
 ## Features
 

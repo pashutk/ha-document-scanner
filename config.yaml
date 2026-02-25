@@ -1,5 +1,5 @@
 name: "Document Scanner"
-description: "Scan documents from HP printer via eSCL"
+description: "Scan documents from any eSCL/AirScan compatible printer"
 version: "1.3.0"
 slug: "scanner"
 init: false
