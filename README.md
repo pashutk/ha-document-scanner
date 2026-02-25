@@ -1,5 +1,9 @@
 # Document Scanner for Home Assistant
 
+![GitHub release](https://img.shields.io/github/v/release/pashutk/ha-document-scanner)
+![License](https://img.shields.io/github/license/pashutk/ha-document-scanner)
+![HA addon](https://img.shields.io/badge/Home%20Assistant-Addon-blue)
+
 A Home Assistant addon that scans documents from any eSCL/AirScan compatible printer (HP, Brother, Canon, etc.). Two dashboard buttons: **Scan Page** appends to today's document, **New Document** starts a fresh file.
 
 ## Features
