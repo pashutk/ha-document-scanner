@@ -1,6 +1,6 @@
 name: "Document Scanner"
 description: "Scan documents from HP printer via eSCL"
-version: "1.0.3"
+version: "1.1.0"
 slug: "scanner"
 init: false
 arch:
@@ -8,8 +8,6 @@ arch:
   - amd64
 stdin: true
 homeassistant_api: true
-hassio_api: true
-auth_api: true
 map:
   - media:rw
 options:

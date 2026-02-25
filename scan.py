@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scanner automation script for HP printers via eSCL protocol.
+"""Scanner automation for HP printers via eSCL protocol.
 
 Reads commands from stdin: "append" or "new" (one per line).
 
@@ -7,6 +7,7 @@ Environment variables:
   SCANNER_PRINTER_IP   - Printer IP address (required)
   SCANNER_OUTPUT_DIR   - Directory to save scanned PDFs (required)
   SCANNER_RESOLUTION   - Scan resolution in DPI (default: 300)
+  SUPERVISOR_TOKEN     - HA API token (injected by HA)
 """
 
 import io
@@ -23,7 +24,7 @@ PRINTER_IP = os.environ.get("SCANNER_PRINTER_IP")
 SCAN_DIR_STR = os.environ.get("SCANNER_OUTPUT_DIR")
 RESOLUTION = int(os.environ.get("SCANNER_RESOLUTION", "300"))
 SUPERVISOR_TOKEN = os.environ.get("SUPERVISOR_TOKEN")
-HA_URL = "http://supervisor/core/api"
+HA_API = "http://supervisor/core/api"
 
 WIDTH = 2550
 HEIGHT = 3508
@@ -59,7 +60,7 @@ def set_status(state, filename=""):
         "attributes": {"friendly_name": "Scanner", "file": filename},
     }).encode()
     req = urllib.request.Request(
-        f"{HA_URL}/states/sensor.scanner_status",
+        f"{HA_API}/states/sensor.scanner_status",
         data=data,
         headers={
             "Authorization": f"Bearer {SUPERVISOR_TOKEN}",
@@ -69,7 +70,6 @@ def set_status(state, filename=""):
     )
     try:
         urllib.request.urlopen(req, timeout=5)
-        print(f"Status set to: {state}", flush=True)
     except Exception as e:
         print(f"Failed to set status: {e}", flush=True)
 
@@ -144,15 +144,12 @@ def merge_pdfs(existing_path, new_pdf_bytes):
     from pypdf import PdfReader, PdfWriter
 
     writer = PdfWriter()
-
     reader = PdfReader(str(existing_path))
     for page in reader.pages:
         writer.add_page(page)
-
     new_reader = PdfReader(io.BytesIO(new_pdf_bytes))
     for page in new_reader.pages:
         writer.add_page(page)
-
     with open(existing_path, "wb") as f:
         writer.write(f)
 
@@ -185,7 +182,8 @@ def main():
         sys.exit(1)
 
     scan_dir = Path(SCAN_DIR_STR)
-    print(f"Scanner ready (HA API: {'yes' if SUPERVISOR_TOKEN else 'no'}), waiting for commands...", flush=True)
+    print("Scanner ready, waiting for commands...", flush=True)
+    set_status("idle")
 
     for line in sys.stdin:
         try:
